@@ -1,0 +1,83 @@
+# ==========================================================================
+# Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD-ROCm Docker Compose File
+# ==========================================================================
+# Version:      1.0
+# Created:      March 03, 2026
+# Last Updated: March 04, 2026
+#
+# Description:
+#
+#   This Docker Compose file deploys the Deepseek-R1-1.5B-Langchain-AI-Agent-RAG
+#   environment optimized for AMD GPU acceleration using ROCm.
+#
+#   It provides a complete Retrieval-Augmented Generation (RAG) API service
+#   powered by LangChain, integrated with Ollama for model loading and
+#   management on Advantech edge AI devices and AMD ROCm-enabled platforms.
+#
+#   The stack includes:
+#     - LangChain RAG backend service
+#     - Ollama model runtime with ROCm GPU acceleration
+#     - OpenWebUI web interface for interactive prompt testing
+#
+#   This configuration supports AMD RDNA/CDNA GPUs via:
+#     - /dev/kfd
+#     - /dev/dri
+#     - ROCm device passthrough
+#
+#
+# Terms and Conditions:
+#   1. This software is provided by Advantech Corporation "as is" and any
+#      express or implied warranties, including, but not limited to, the implied
+#      warranties of merchantability and fitness for a particular purpose are
+#      disclaimed.
+#   2. In no event shall Advantech Corporation be liable for any direct, indirect,
+#      incidental, special, exemplary, or consequential damages arising in any way
+#      out of the use of this software.
+#   3. Redistribution and use in source and binary forms, with or without
+#      modification, are permitted provided that the above copyright notice and
+#      this permission notice appear in all copies.
+#
+# Copyright (c) 2026 Advantech Corporation. All rights reserved.
+# ==========================================================================
+
+services:
+  langchain-rag-amd:
+    image: harbor.edgesync.cloud/amd/deepseek-langchain-rag-on-amd-rocm:1.3
+    container_name: Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD
+    environment:
+      - HF_HUB_OFFLINE=1
+      - TRANSFORMERS_OFFLINE=1
+    network_mode: host
+    env_file: .env
+    tty: true
+    stdin_open: true
+    privileged: true
+    working_dir: /workspace
+    volumes:
+      - ./langchain-rag-service:/workspace/langchain-service/
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - video
+    restart: always
+
+  openweb-ui-service:
+    image: ghcr.io/open-webui/open-webui:0.6.5
+    container_name: openweb-ui-service
+    network_mode: host
+    env_file: .env
+    environment:
+      OPENAI_API_BASE_URL: ${OPENAI_API_LANGCHAIN_BASE}
+      PORT: ${OPENWEBUI_PORT}
+      ENABLE_TAGS_GENERATION: ${ENABLE_TAGS_GENERATION}
+      ENABLE_TITLE_GENERATION: ${ENABLE_TITLE_GENERATION}
+    volumes:
+      - open-webui:/app/backend/data
+    restart: always
+
+volumes:
+  open-webui:
+    driver: local
+  ollama-models:
+    driver: local
