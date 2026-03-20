@@ -142,9 +142,6 @@ OPENAI_API_LANGCHAIN_BASE=http://localhost:8000
   
   # Run `start_services.sh script`
   ./start_services.sh
-  ```
-
-  ```
 - Now verify that Ollama should be accessible on the following address on a browser externally
   ```
     http://<device_ip>:11434

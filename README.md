@@ -4,9 +4,173 @@
 Deepseek-R1 1.5B Langchain AI Agent (RAG) on AMD Rocm Image delivers a modular, high-performance AI chat solution tailored for Rocm™ edge devices that extracts relevant information from a PDF document. It combines Ollama with the DeepSeek R1 1.5B model for LLM inference, a FastAPI-based Langchain middleware for orchestration and tool integration, and OpenWebUI for an intuitive user interface. The container supports Retrieval-Augmented Generation (RAG), tool-augmented reasoning, conversational memory, and custom LLM workflows, making it ideal for building intelligent, context-aware agents. It is fully optimized for hardware acceleration on Rocm platforms. This container particularly shows how RAG use case could be built using DeepSeek & Langchain.
 
 ## Host System Requirements
-TODO: ROCM use rocminfo view the hardware info
+Need ROCm support. Use the rocminfo command to check ROCm information.
 
+```bash
+sudo rocminfo
+```
 
+```
+ROCk module is loaded
+=====================
+HSA System Attributes
+=====================
+Runtime Version:         1.1
+System Timestamp Freq.:  1000.000000MHz
+Sig. Max Wait Duration:  18446744073709551615 (0xFFFFFFFFFFFFFFFF) (timestamp count)
+Machine Model:           LARG
+System Endianness:       LITTLE
+Mwaitx:                  DISABLED
+DMAbuf Support:          YES
+==========
+
+HSA Agents
+==========
+*******
+Agent 1
+*******
+  Name:                    AMD Ryzen 7 PRO 8845HS w/ Radeon 780M Graphics
+  Uuid:                    CPU-XX
+  Marketing Name:          AMD Ryzen 7 PRO 8845HS w/ Radeon 780M Graphics
+  Vendor Name:             CPU
+  Feature:                 None specified
+  Profile:                 FULL_PROFILE
+  Float Round Mode:        NEAR
+  Max Queue Number:        0(0x0)
+  Queue Min Size:          0(0x0)
+  Queue Max Size:          0(0x0)
+  Queue Type:              MULTI
+  Node:                    0
+  Device Type:             CPU
+  Cache Info:
+    L1:                      32768(0x8000) KB
+  Chip ID:                 0(0x0)
+  ASIC Revision:           0(0x0)
+  Cacheline Size:          64(0x40)
+  Max Clock Freq. (MHz):   0
+  BDFID:                   0
+  Internal Node ID:        0
+  Compute Unit:            16
+  SIMDs per CU:            0
+  Shader Engines:          0
+  Shader Arrs. per Eng.:   0
+  WatchPts on Addr. Ranges:1
+  Features:                None
+  Pool Info:
+    Pool 1
+      Segment:                 GLOBAL; FLAGS: FINE GRAINED
+      Size:                    15593232(0xedef10) KB
+      Allocatable:             TRUE
+      Alloc Granule:           4KB
+      Alloc Alignment:         4KB
+      Accessible by all:       TRUE
+    Pool 2
+      Segment:                 GLOBAL; FLAGS: KERNARG, FINE GRAINED
+      Size:                    15593232(0xedef10) KB
+      Allocatable:             TRUE
+      Alloc Granule:           4KB
+      Alloc Alignment:         4KB
+      Accessible by all:       TRUE
+    Pool 3
+      Segment:                 GLOBAL; FLAGS: COARSE GRAINED
+      Size:                    15593232(0xedef10) KB
+      Allocatable:             TRUE
+      Alloc Granule:           4KB
+      Alloc Alignment:         4KB
+      Accessible by all:       TRUE
+  ISA Info:
+*******
+Agent 2
+*******
+  Name:                    gfx1103
+  Uuid:                    GPU-XX
+  Marketing Name:          AMD Radeon 780M Graphics
+  Vendor Name:             AMD
+  Feature:                 KERNEL_DISPATCH
+  Profile:                 BASE_PROFILE
+  Float Round Mode:        NEAR
+  Max Queue Number:        128(0x80)
+  Queue Min Size:          64(0x40)
+  Queue Max Size:          131072(0x20000)
+  Queue Type:              MULTI
+  Node:                    1
+  Device Type:             GPU
+  Cache Info:
+    L1:                      32(0x20) KB
+    L2:                      2048(0x800) KB
+  Chip ID:                 6400(0x1900)
+  ASIC Revision:           12(0xc)
+  Cacheline Size:          64(0x40)
+  Max Clock Freq. (MHz):   2700
+  BDFID:                   1536
+  Internal Node ID:        1
+  Compute Unit:            12
+  SIMDs per CU:            2
+  Shader Engines:          1
+  Shader Arrs. per Eng.:   2
+  WatchPts on Addr. Ranges:4
+  Features:                KERNEL_DISPATCH
+  Fast F16 Operation:      TRUE
+  Wavefront Size:          32(0x20)
+  Workgroup Max Size:      1024(0x400)
+  Workgroup Max Size per Dimension:
+    x                        1024(0x400)
+    y                        1024(0x400)
+    z                        1024(0x400)
+  Max Waves Per CU:        32(0x20)
+  Max Work-item Per CU:    1024(0x400)
+  Grid Max Size:           4294967295(0xffffffff)
+  Grid Max Size per Dimension:
+    x                        4294967295(0xffffffff)
+    y                        4294967295(0xffffffff)
+    z                        4294967295(0xffffffff)
+  Max fbarriers/Workgrp:   32
+  Packet Processor uCode:: 35
+  SDMA engine uCode::      16
+  IOMMU Support::          None
+  Pool Info:
+    Pool 1
+      Segment:                 GLOBAL; FLAGS: COARSE GRAINED
+      Size:                    7796616(0x76f788) KB
+      Allocatable:             TRUE
+      Alloc Granule:           4KB
+      Alloc Alignment:         4KB
+      Accessible by all:       FALSE
+    Pool 2
+      Segment:                 GLOBAL; FLAGS:
+      Size:                    7796616(0x76f788) KB
+      Allocatable:             TRUE
+      Alloc Granule:           4KB
+      Alloc Alignment:         4KB
+      Accessible by all:       FALSE
+    Pool 3
+      Segment:                 GROUP
+      Size:                    64(0x40) KB
+      Allocatable:             FALSE
+      Alloc Granule:           0KB
+      Alloc Alignment:         0KB
+      Accessible by all:       FALSE
+  ISA Info:
+    ISA 1
+      Name:                    amdgcn-amd-amdhsa--gfx1103
+      Machine Models:          HSA_MACHINE_MODEL_LARGE
+      Profiles:                HSA_PROFILE_BASE
+      Default Rounding Mode:   NEAR
+      Default Rounding Mode:   NEAR
+      Fast f16:                TRUE
+      Workgroup Max Size:      1024(0x400)
+      Workgroup Max Size per Dimension:
+        x                        1024(0x400)
+        y                        1024(0x400)
+        z                        1024(0x400)
+      Grid Max Size:           4294967295(0xffffffff)
+      Grid Max Size per Dimension:
+        x                        4294967295(0xffffffff)
+        y                        4294967295(0xffffffff)
+        z                        4294967295(0xffffffff)
+      FBarrier Max Size:       32
+*** Done ***
+```
 
 ## Key Features
 
@@ -27,7 +191,7 @@ TODO: ROCM use rocminfo view the hardware info
 
 
 ## Architecture
-![langchain-rag.png](data/architecture/langchain-rag.png)
+![langchain-rag.png](/data/architecture/langchain-rag.png)
 
 ## Repository Structure
 ```
@@ -283,7 +447,7 @@ http://localhost:3000
 ### Select Model
 In case Ollama has multiple models available, choose from the list of models on the top-left of OpenWebUI after signing up/logging in successfully. As shown below. Select DeepSeek R1 1.5B:
 
-![Select Model](data/images/select-model.png)
+![Select Model](/data/images/select-model.png)
 
 ### Quick Demonstration:
 
@@ -403,84 +567,6 @@ Sample Screenshot:
 ![ollama-curl.png](data/images/ollama-curl.png)
 
 For further API details, please refer to the official documentation of Ollama as mentioned on top.
-
-### FastAPI (Serving LangChain)
-Swagger docs could be accessed on the following endpoint:
-```
-http://localhost:8000/docs
-```
-Sample Screenshot:
-
-![fast-api.png](data/images/fast-api.png)
-
-Inference Request:
-```bash
-curl -X 'POST' \
-  'http://localhost:8000/chat/completions' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "model": "string",
-  "messages": [
-    {
-      "role": "user",
-      "content": "Hi"
-    }
-  ],
-  "stream": true
-}'
-```
-Response:
-```json
-data: {"id": "992f00ed-5c75-4d9e-b177-3a4a815044e1", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "<think>"}, "index": 0, "finish_reason": null}]}
-data: {"id": "594dc272-7d2a-4bdd-8020-4ecb6a618e1a", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "\n\n"}, "index": 0, "finish_reason": null}]}
-data: {"id": "5a0e84ce-3cb8-47bb-9d79-b3049f07fe5e", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "</think>"}, "index": 0, "finish_reason": null}]}
-data: {"id": "88f7035d-aa87-4b7b-bb43-111675bd2bf4", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "\n\n"}, "index": 0, "finish_reason": null}]}
-data: {"id": "247efa16-9312-4365-ba86-caf1a8eeba0a", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "Hello"}, "index": 0, "finish_reason": null}]}
-data: {"id": "511c7066-81c2-435b-b6ee-a5867bbf4278", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "!"}, "index": 0, "finish_reason": null}]}
-data: {"id": "f5d5d7dd-c2fd-48d0-a523-453ad949f9f3", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " I"}, "index": 0, "finish_reason": null}]}
-data: {"id": "d1030af7-42e5-4364-90f2-977b3b798881", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "'m"}, "index": 0, "finish_reason": null}]}
-data: {"id": "1ac9f459-0412-41c6-97f8-4042c38e412a", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " Deep"}, "index": 0, "finish_reason": null}]}
-data: {"id": "da00b6d6-2293-4f36-8f7d-c22761940b47", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "Seek"}, "index": 0, "finish_reason": null}]}
-data: {"id": "aadb2200-144f-415e-9bb5-395cde6b2cc8", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "-R"}, "index": 0, "finish_reason": null}]}
-data: {"id": "28a645a7-be76-4d7f-9a1c-bf53130aa771", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "1"}, "index": 0, "finish_reason": null}]}
-data: {"id": "60568346-3b34-42e1-9d4f-55a6acf562df", "object": "chat.completion.chunk", "choices": [{"delta": {"content": ","}, "index": 0, "finish_reason": null}]}
-data: {"id": "5b873b14-5021-4e27-9894-e1d586452591", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " an"}, "index": 0, "finish_reason": null}]}
-data: {"id": "4d405a40-c4c0-41cc-8077-ea1f90de384f", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " artificial"}, "index": 0, "finish_reason": null}]}
-data: {"id": "f57bf86b-7496-4f51-9c8c-bc17b2c0f94c", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " intelligence"}, "index": 0, "finish_reason": null}]}
-data: {"id": "b7186ff7-d6ea-4b8f-9ba7-47e4130ca6bb", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " assistant"}, "index": 0, "finish_reason": null}]}
-data: {"id": "e61a3cf2-5f39-4092-b620-87a8c4690d9d", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " created"}, "index": 0, "finish_reason": null}]}
-data: {"id": "63fa140f-275b-422e-80b3-95637435dd52", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " by"}, "index": 0, "finish_reason": null}]}
-data: {"id": "02d70086-c348-4fa9-8f39-ecdae12f5536", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " Deep"}, "index": 0, "finish_reason": null}]}
-data: {"id": "5e74e1f0-9905-436f-9b7a-338db2697379", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "Seek"}, "index": 0, "finish_reason": null}]}
-data: {"id": "2260ad12-047d-4659-913b-62d0797c71da", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "."}, "index": 0, "finish_reason": null}]}
-data: {"id": "d640f37f-47fb-4d4a-95ec-4b35b7d1090e", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " For"}, "index": 0, "finish_reason": null}]}
-data: {"id": "4c62111c-9cca-4688-bc13-35c279f11d3f", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " comprehensive"}, "index": 0, "finish_reason": null}]}
-data: {"id": "1e813032-7425-4561-b0f2-23ae02eb4c08", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " details"}, "index": 0, "finish_reason": null}]}
-data: {"id": "14842ffb-f597-4249-ae9a-6b9f26e5ad88", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " about"}, "index": 0, "finish_reason": null}]}
-data: {"id": "a7ae30a5-aec6-4869-a268-8e2fcf820a13", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " our"}, "index": 0, "finish_reason": null}]}
-data: {"id": "63cb565f-ef72-4699-963b-e30cde223d23", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " models"}, "index": 0, "finish_reason": null}]}
-data: {"id": "bcb722fc-93aa-4a33-8159-f8af651daf8b", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " and"}, "index": 0, "finish_reason": null}]}
-data: {"id": "4a37b230-4ae8-489f-b2c3-6ce8e380ab6d", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " products"}, "index": 0, "finish_reason": null}]}
-data: {"id": "e3f590c7-a91d-48e0-ad9b-775c0dddf5e5", "object": "chat.completion.chunk", "choices": [{"delta": {"content": ","}, "index": 0, "finish_reason": null}]}
-data: {"id": "e8a23c36-6799-479e-a193-02403de6bf16", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " we"}, "index": 0, "finish_reason": null}]}
-data: {"id": "888aa4f4-f0e8-4bd8-b1d0-f5ae96d564bf", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " invite"}, "index": 0, "finish_reason": null}]}
-data: {"id": "d0280f2b-3790-4795-b69d-f1fc76f6b2cf", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " you"}, "index": 0, "finish_reason": null}]}
-data: {"id": "538f2658-634b-41f2-9ca6-9f7eaf461e6d", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " to"}, "index": 0, "finish_reason": null}]}
-data: {"id": "3184150d-9293-4179-8a55-8e7688f27766", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " consult"}, "index": 0, "finish_reason": null}]}
-data: {"id": "d53986d8-57e8-4e1f-a2eb-b333e2fd38f8", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " our"}, "index": 0, "finish_reason": null}]}
-data: {"id": "aee0a44c-498b-4411-a349-682d05d75507", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " official"}, "index": 0, "finish_reason": null}]}
-data: {"id": "997abcb5-a02b-4842-ad62-79da2ca9cd09", "object": "chat.completion.chunk", "choices": [{"delta": {"content": " documentation"}, "index": 0, "finish_reason": null}]}
-data: {"id": "0754314c-2953-435f-9a25-71b7ba4fbc95", "object": "chat.completion.chunk", "choices": [{"delta": {"content": "."}, "index": 0, "finish_reason": null}]}
-data: [DONE]
-```
-Please note that the inference response will be in streaming mode only in the case of FastAPI.
-
-Sample Screenshot:
-
-![fast-api-curl.png](data/images/fast-api-curl.png)
-
-The same requests can also be made from Fast-API swagger docs.
 
 ## Known Limitations
 

@@ -172,7 +172,7 @@ if name == "__main__":
 This online tool can be used to convert & quantize Hugging Face models with ease & pushes the final model into the user's own Hugging Face account. Though this tool at times faces lots of traffic and may not be available all the time.
 [GGUF Repo](https://huggingface.co/spaces/ggml-org/gguf-my-repo)
 
-![ggm-repo](..%2Fdata%2Fimages%2Fggml-repo.png)
+![ggm-repo](data/images/ggml-repo.png)
 
 ## Option 3: Manual Steps to Handle Model Download, GGUF Conversion, and Quantization.
 
@@ -225,14 +225,14 @@ Example:
 ```
 ./llama.cpp/build/bin/llama-quantize   models/Llama-3.2-1B-Instruct.gguf   models/Llama-3.2-1B-Instruct.gguf Q4_K_M
 ```
-![Quantization](data/images/quantization.png)
+![Quantization](/data/images/quantization.png)
 
 ### Check the llama-quantize help document.
 
 ```
 ./llama.cpp/build/bin/llama-quantize --help
 ```
-![Quantize Help](data/images/quantize-help.png)
+![Quantize Help](/data/images/quantize-help.png)
 
 ### Supported Quantization Types
 Key Points:
