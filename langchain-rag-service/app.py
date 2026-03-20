@@ -117,4 +117,3 @@ async def list_models():
             "owned_by": "user"
         } for model in tags]
     }
-

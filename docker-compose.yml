@@ -42,7 +42,7 @@
 
 services:
   langchain-rag-amd:
-    image: harbor.edgesync.cloud/amd/deepseek-langchain-rag-on-amd-rocm:1.3
+    image: harbor.edgesync.cloud/amd/deepseek-langchain-rag-on-amd-rocm:1.4
     container_name: Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD
     environment:
       - HF_HUB_OFFLINE=1
@@ -55,6 +55,8 @@ services:
     working_dir: /workspace
     volumes:
       - ./langchain-rag-service:/workspace/langchain-service/
+      - ./wise-bench:/workspace/wise-bench/
+      - ./ollama-models:/root/.ollama
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
