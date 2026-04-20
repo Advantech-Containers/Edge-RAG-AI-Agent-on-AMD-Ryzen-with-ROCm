@@ -231,7 +231,6 @@ Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD-Rocm/
     ├── app.py                                # Main LangChain-FastAPI app
     ├── llm_loader.py                         # LLM loader (Ollama, DeepSeek, etc.)
     ├── rag_utils.py                          # RAG helper functions like load pdf, split, etc.
-    ├── requirements.txt                      # Python dependencies
     ├── schema.py                             # Request schema helper
     ├── utils.py                              # Utility functions helper
     └── start_services.sh                     # Startup script
@@ -341,7 +340,7 @@ The following software components/packages are provided further inside the conta
 |-------------------------|-----------------------------------------------------------------------------------------|
 | Supported Format        | PDF                                                                                    |
 | File Type               | Text-based documents only (scanned or image-based PDFs are not supported). Table data within supported PDFs can also be read and processed                             |
-| Recommended File Size   | While files up to 50 MB (approximately 2,500 pages, ~450,000 words) have been tested, performance may degrade with larger or more complex documents.                                                                                   |
+| Recommended File Size   | While files up to 170 MB (approximately 4,300 pages, ~1495,000 words) have been tested, performance may degrade with larger or more complex documents.                                                                                   |
 | Unsupported Formats     | Scanned/image-only PDFs, OCR-intensive documents, Word documents, CSV or text files, and encrypted PDFs                                                                                   |
 | Upload Method           | PDF upload via the UI is currently not supported. Please place files directly in the `langchain-rag-service/pdf` directory                                       |
 | Multi-file Support      | Multiple PDFs can be ingested simultaneously. However, it is recommended to avoid documents with overlapping, redundant, or irrelevant content, as this may reduce retrieval accuracy and lead to inconsistent responses                                    |
@@ -383,6 +382,13 @@ Before starting services, upload your PDF documents (or use the default one) to 
 ```bash
 # Place your PDFs in the following directory
 ./langchain-rag-service/pdfs/
+```
+
+### Change LLM model 
+```bash
+# In the .env, MODEL_NAME is the name of the model.
+# The default model is deepseek-r1:1.5b, which can be changed to qwen3:1.7b, qwen2.5:0.5b, etc.
+MODEL_NAME="deepseek-r1:1.5b"
 ```
 
 ### Build and Launch the Container

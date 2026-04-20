@@ -79,7 +79,8 @@ async def chat_completion(request: Request, chat_request: ChatRequest):
 
     # Prepare RAG
     callback = AsyncIteratorCallbackHandler()
-    llm = get_llm(callback)
+    # llm = get_llm(callback)
+    llm = get_llm(callback, model_name=model_name)
     rag_chain = RetrievalQA.from_chain_type(llm=llm,    chain_type="stuff",
  retriever=retriever)
 

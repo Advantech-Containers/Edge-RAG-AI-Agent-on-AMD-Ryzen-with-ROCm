@@ -2,14 +2,10 @@
 # ==========================================================================
 # Advantech AMD ROCm Wise-Bench Hardware Diagnostics Script
 # ==========================================================================
-# Version:      2.0.0
-# Author:       Adapted from Samir Singh <samir.singh@advantech.com>
-# Created:      2026-03-09
-# Last Updated: 2026-03-09
-#
+# Version:      2.1.0
 # Description:
 #   Comprehensive hardware and AI framework diagnostics for AMD ROCm devices.
-#   This version only checks components that are actually working in your environment.
+#   ONNX Runtime is informational only and does not affect system score.
 # ==========================================================================
 
 clear
@@ -37,7 +33,7 @@ NC='\033[0m'
 MODEL_NAME="deepseek-r1:1.5b"
 OLLAMA_API_BASE="http://localhost:11434"
 
-# Print banner (REPLACED with Advantech_COE style)
+# Print banner
 echo -e "${BLUE}${BOLD}+------------------------------------------------------+${NC}"
 echo -e "${BLUE}${BOLD}|    ${PURPLE}Advantech_COE AMD ROCm Diagnostics Tool${BLUE}         |${NC}"
 echo -e "${BLUE}${BOLD}+------------------------------------------------------+${NC}"
@@ -57,7 +53,7 @@ echo
 sleep 2
 
 # ==========================================================================
-# Helper Functions (KEPT the same)
+# Helper Functions
 # ==========================================================================
 print_header() {
     echo
@@ -217,7 +213,7 @@ else
     print_table_row "/dev/dri" "✗ Missing"
 fi
 
-# Try rocm-smi if available (but don't fail if not)
+# Try rocm-smi if available
 if command -v rocm-smi &> /dev/null; then
     GPU_USE=$(rocm-smi --showuse 2>/dev/null | grep "GPU Use" | head -1)
     GPU_MEM=$(rocm-smi --showmeminfo vram 2>/dev/null | grep "Total" | head -1)
@@ -225,7 +221,7 @@ if command -v rocm-smi &> /dev/null; then
     [ -n "$GPU_MEM" ] && print_table_row "GPU Memory" "$(echo $GPU_MEM | awk '{print $3$4}')"
 fi
 
-# Get GPU count from PyTorch (more reliable)
+# Get GPU count from PyTorch
 GPU_COUNT=$(python3 -c "
 import torch
 print(torch.cuda.device_count() if torch.cuda.is_available() else 0)
@@ -287,7 +283,6 @@ except Exception as e:
     print('0')
 " 2>/dev/null)
 
-# Parse the output
 PYTORCH_VERSION=$(echo "$PYTORCH_INFO" | sed -n '1p')
 CUDA_AVAILABLE=$(echo "$PYTORCH_INFO" | sed -n '3p')
 DEVICE_COUNT=$(echo "$PYTORCH_INFO" | sed -n '4p')
@@ -319,15 +314,11 @@ fi
 print_table_footer
 
 # ==========================================================================
-# 5️⃣ ONNX Runtime ROCm Test
+# 5️⃣ ONNX Runtime - Informational Only (Not Scored)
 # ==========================================================================
-print_header "ONNX RUNTIME ROCm TEST"
+print_header "ONNX RUNTIME (Informational)"
 echo -ne "▶ Checking ONNX providers... "
-BAR_SIZE=20
-for ((i=0; i<$BAR_SIZE; i++)); do
-    echo -ne "█"
-    sleep 0.05
-done
+for i in {1..20}; do echo -ne "█"; sleep 0.02; done
 echo -e " ✓"
 
 print_table_header "ONNX RUNTIME DETAILS"
@@ -340,17 +331,17 @@ try:
     providers = ort.get_available_providers()
     print(','.join(providers))
     if 'ROCMExecutionProvider' in providers:
-        print('Yes')
+        print('Available')
     else:
-        print('No')
+        print('Not available (CPU mode)')
 except ImportError:
     print('Not installed')
     print('None')
-    print('No')
+    print('Not installed')
 except Exception as e:
     print(f'Error: {e}')
     print('None')
-    print('No')
+    print('Error')
 " 2>/dev/null)
 
 ONNX_VERSION=$(echo "$ONNX_INFO" | sed -n '1p')
@@ -358,15 +349,18 @@ ONNX_PROVIDERS=$(echo "$ONNX_INFO" | sed -n '2p')
 ONNX_ROCM=$(echo "$ONNX_INFO" | sed -n '3p')
 
 print_table_row "ONNX Version" "$ONNX_VERSION"
-print_table_row "Providers" "$ONNX_PROVIDERS"
-if [ "$ONNX_ROCM" = "Yes" ]; then
-    print_table_row "ROCM Provider" "✓ Available"
-    ONNX_STATUS=1
+print_table_row "Available Providers" "$ONNX_PROVIDERS"
+
+if [ "$ONNX_ROCM" = "Available" ]; then
+    print_table_row "ROCM Support" "✓ Enabled (GPU)"
+elif [ "$ONNX_ROCM" = "Not available (CPU mode)" ]; then
+    print_table_row "ROCM Support" "ℹ CPU Mode Only"
 else
-    print_table_row "ROCM Provider" "⚠ Not available"
-    ONNX_STATUS=0
+    print_table_row "ROCM Support" "ℹ Not installed"
 fi
+
 print_table_footer
+print_info "ONNX Runtime is informational only - does not affect system score"
 
 # ==========================================================================
 # 6️⃣ Ollama + LangChain + FAISS Check
@@ -451,12 +445,12 @@ fi
 print_table_footer
 
 # ==========================================================================
-# 7️⃣ Diagnostics Summary
+# 7️⃣ Diagnostics Summary (ONNX Removed from Scoring)
 # ==========================================================================
 print_header "DIAGNOSTICS SUMMARY"
 print_table_header "COMPONENT STATUS"
 
-MAX=6
+MAX=5  # Reduced from 6 (removed ONNX)
 
 # ROCm Installation
 if [ "$ROCM_STATUS" -eq 1 ]; then
@@ -494,15 +488,6 @@ else
     PYTORCH_SCORE=0
 fi
 
-# ONNX ROCm
-if [ "$ONNX_STATUS" -eq 1 ]; then
-    print_table_row "ONNX Runtime ROCm" "✓ Accelerated"
-    ONNX_SCORE=1
-else
-    print_table_row "ONNX Runtime ROCm" "⚠ CPU Only"
-    ONNX_SCORE=0
-fi
-
 # Ollama Service
 if [ "$OLLAMA_STATUS" -eq 1 ]; then
     print_table_row "Ollama Service" "✓ Running"
@@ -513,7 +498,7 @@ else
 fi
 
 # Calculate total
-TOTAL=$((ROCM_SCORE + HIP_SCORE + GPU_SCORE + PYTORCH_SCORE + ONNX_SCORE + OLLAMA_SCORE))
+TOTAL=$((ROCM_SCORE + HIP_SCORE + GPU_SCORE + PYTORCH_SCORE + OLLAMA_SCORE))
 PERCENTAGE=$((TOTAL * 100 / MAX))
 
 print_table_row "Overall Score" "$PERCENTAGE% ($TOTAL/$MAX)"
@@ -549,9 +534,8 @@ print_table_row "System Status" "$STATUS"
 
 print_table_footer
 
-
 # ==========================================================================
-# RECOMMENDATIONS
+# RECOMMENDATIONS (ONNX removed)
 # ==========================================================================
 print_header "RECOMMENDATIONS"
 
@@ -574,13 +558,7 @@ if [ "$PYTORCH_SCORE" -eq 0 ] && [ "$ROCM_SCORE" -eq 1 ]; then
     ISSUE_COUNT=$((ISSUE_COUNT + 1))
     print_warning "Issue $ISSUE_COUNT: PyTorch ROCm support not detected"
     print_info "  Install:"
-    print_info "  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.1"
-fi
-
-if [ "$ONNX_SCORE" -eq 0 ] && [ "$ROCM_SCORE" -eq 1 ]; then
-    ISSUE_COUNT=$((ISSUE_COUNT + 1))
-    print_warning "Issue $ISSUE_COUNT: ONNX Runtime ROCm provider missing"
-    print_info "  Install: pip install onnxruntime-rocm"
+    print_info "  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.2"
 fi
 
 if [ "$OLLAMA_SCORE" -eq 0 ]; then

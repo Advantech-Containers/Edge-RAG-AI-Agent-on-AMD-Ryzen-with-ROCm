@@ -26,7 +26,7 @@ class MyLoggingHandler(BaseCallbackHandler):
         print("\n=== LLM Request End ===")
 
 
-def get_llm(callback_handler=None):
+def get_llm(callback_handler=None, model_name=None):
 
     system_prompt = """
 You are a helpful assistant with access to a knowledge base (document) and general world knowledge.
@@ -48,8 +48,8 @@ Assistant: Hi, how can I assist you?
 
     llm = Ollama(
         base_url=os.getenv("OLLAMA_API_BASE"),
-        model=os.getenv("MODEL_NAME"),
-
+        #model=os.getenv("MODEL_NAME"),
+        model=model_name,
         temperature=to_float(os.getenv("TEMPERATURE", 0.7)),
         num_ctx=to_int(os.getenv("NUM_CTX")),
         num_gpu=to_int(os.getenv("NUM_GPU")),

@@ -24,8 +24,19 @@ echo "Waiting 5 seconds for server to initialize..."
 sleep 5
 
 # Pull the model using MODEL_NAME from .env
-echo "Pulling model: $MODEL_NAME ..."
-ollama pull "$MODEL_NAME"
+echo "Pulling models..."
+
+for MODEL in $MODEL_NAME; do
+    echo "Pulling model: $MODEL ..."
+    ollama pull "$MODEL"
+
+    if [ $? -eq 0 ]; then
+        echo "Model '$MODEL' pulled successfully!"
+    else
+        echo "Failed to pull model '$MODEL'."
+        exit 1
+    fi
+done
 
 # Check if the model was pulled successfully
 if [ $? -eq 0 ]; then

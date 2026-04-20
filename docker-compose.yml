@@ -42,11 +42,10 @@
 
 services:
   langchain-rag-amd:
-    image: harbor.edgesync.cloud/amd/deepseek-langchain-rag-on-amd-rocm:1.4
+    image: harbor.edgesync.cloud/amd/deepseek-langchain-rag-on-amd-rocm:2.0
     container_name: Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD
     environment:
-      - HF_HUB_OFFLINE=1
-      - TRANSFORMERS_OFFLINE=1
+      - HSA_OVERRIDE_GFX_VERSION=11.0.0
     network_mode: host
     env_file: .env
     tty: true
