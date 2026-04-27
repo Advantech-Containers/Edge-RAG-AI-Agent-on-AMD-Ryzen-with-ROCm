@@ -38,14 +38,6 @@ for MODEL in $MODEL_NAME; do
     fi
 done
 
-# Check if the model was pulled successfully
-if [ $? -eq 0 ]; then
-    echo "Model '$MODEL_NAME' pulled successfully!"
-else
-    echo "Failed to pull model '$MODEL_NAME'."
-    exit 1
-fi
-
 # Starting FastAPI Server
 echo "Starting FastAPI (Langchain) server on port $FASTAPI_LANGCHAIN_PORT..."
 nohup uvicorn app:app --host 0.0.0.0 --port "$FASTAPI_LANGCHAIN_PORT" > uvicorn.log 2>&1 &

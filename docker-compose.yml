@@ -46,6 +46,8 @@ services:
     container_name: Deepseek-R1-1.5B-Langchain-AI-Agent-RAG-on-AMD
     environment:
       - HSA_OVERRIDE_GFX_VERSION=11.0.0
+      - OLLAMA_LLM_LIBRARY=${OLLAMA_LLM_LIBRARY}
+
     network_mode: host
     env_file: .env
     tty: true

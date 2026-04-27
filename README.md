@@ -391,6 +391,15 @@ Before starting services, upload your PDF documents (or use the default one) to 
 MODEL_NAME="deepseek-r1:1.5b"
 ```
 
+### Device Control 
+```bash
+# In the .env file, modify OLLAMA_LLM_LIBRARY to set it to CPU mode.
+# CPU-only mode.
+OLLAMA_LLM_LIBRARY=cpu 
+
+# Not just CPU mode, but prioritizes GPU usage.
+OLLAMA_LLM_LIBRARY=
+```
 ### Build and Launch the Container
 ```bash
 # Make the build script executable
@@ -420,7 +429,7 @@ chmod +x wise-bench.sh
 ./wise-bench.sh
 ```
 
-![langchain-wise-bench.png](data/images/langchain-wise-bench.png)
+![langchain-wise-bench](data/gifs/wise_bench.gif)
 
 Wise-bench logs are saved in `wise-bench.log` file under `/workspace`
 
@@ -458,6 +467,9 @@ In case Ollama has multiple models available, choose from the list of models on 
 ### Quick Demonstration:
 
 ![Demo](data/gifs/rag-demo-1.gif)
+
+### GPU TOP information
+![Demo](data/gifs/gpu-top.gif)
 
 ## Prompt Guidelines
 
