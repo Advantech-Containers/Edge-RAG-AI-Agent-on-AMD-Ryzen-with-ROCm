@@ -1,4 +1,4 @@
-# Edge AI Agent on AMD Ryzen™ with ROCm™
+# Edge RAG AI Agent on AMD Ryzen™ with ROCm™
 
 ## Overview
 Deepseek-R1 1.5B Langchain AI Agent (RAG) on AMD Rocm Image delivers a modular, high-performance AI chat solution tailored for Rocm™ edge devices that extracts relevant information from a PDF document. It combines Ollama with the DeepSeek R1 1.5B model for LLM inference, a FastAPI-based Langchain middleware for orchestration and tool integration, and OpenWebUI for an intuitive user interface. The container supports Retrieval-Augmented Generation (RAG), tool-augmented reasoning, conversational memory, and custom LLM workflows, making it ideal for building intelligent, context-aware agents. It is fully optimized for hardware acceleration on Rocm platforms. This container particularly shows how RAG use case could be built using DeepSeek & Langchain.
